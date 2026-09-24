@@ -1,0 +1,191 @@
+{
+  "config": {
+    "methods": [
+      "sft",
+      "dpo",
+      "orpo",
+      "simpo"
+    ],
+    "seeds": [
+      0,
+      1,
+      2
+    ],
+    "n_pairs": 2500,
+    "n_eval": 600,
+    "operand_lo": 10,
+    "operand_hi": 99,
+    "base_steps": 200,
+    "align_steps": 600,
+    "eval_every": 150,
+    "lr_base": 0.002,
+    "lr_align": 0.001,
+    "params": 103055
+  },
+  "base": {
+    "answer_acc": 0.6994,
+    "answer_acc_std": 0.1676,
+    "win_rate": 0.9661,
+    "margin": 4.6495
+  },
+  "methods": {
+    "sft": {
+      "curve": [
+        {
+          "step": 0,
+          "answer_acc": 0.6994,
+          "answer_acc_std": 0.1676,
+          "win_rate": 0.9661
+        },
+        {
+          "step": 150,
+          "answer_acc": 0.9906,
+          "answer_acc_std": 0.0111,
+          "win_rate": 0.9994
+        },
+        {
+          "step": 300,
+          "answer_acc": 0.9922,
+          "answer_acc_std": 0.011,
+          "win_rate": 1.0
+        },
+        {
+          "step": 450,
+          "answer_acc": 1.0,
+          "answer_acc_std": 0.0,
+          "win_rate": 1.0
+        },
+        {
+          "step": 600,
+          "answer_acc": 1.0,
+          "answer_acc_std": 0.0,
+          "win_rate": 1.0
+        }
+      ],
+      "final_answer_acc": 1.0,
+      "final_answer_acc_std": 0.0,
+      "final_win_rate": 1.0,
+      "final_margin": 12.0978
+    },
+    "dpo": {
+      "curve": [
+        {
+          "step": 0,
+          "answer_acc": 0.6994,
+          "answer_acc_std": 0.1676,
+          "win_rate": 0.9661
+        },
+        {
+          "step": 150,
+          "answer_acc": 0.0894,
+          "answer_acc_std": 0.0522,
+          "win_rate": 0.9239
+        },
+        {
+          "step": 300,
+          "answer_acc": 0.09,
+          "answer_acc_std": 0.0477,
+          "win_rate": 0.9639
+        },
+        {
+          "step": 450,
+          "answer_acc": 0.0794,
+          "answer_acc_std": 0.0634,
+          "win_rate": 0.9733
+        },
+        {
+          "step": 600,
+          "answer_acc": 0.0972,
+          "answer_acc_std": 0.0645,
+          "win_rate": 0.99
+        }
+      ],
+      "final_answer_acc": 0.0972,
+      "final_answer_acc_std": 0.0645,
+      "final_win_rate": 0.99,
+      "final_margin": 61.8313
+    },
+    "orpo": {
+      "curve": [
+        {
+          "step": 0,
+          "answer_acc": 0.6994,
+          "answer_acc_std": 0.1676,
+          "win_rate": 0.9661
+        },
+        {
+          "step": 150,
+          "answer_acc": 0.9889,
+          "answer_acc_std": 0.0123,
+          "win_rate": 1.0
+        },
+        {
+          "step": 300,
+          "answer_acc": 0.9928,
+          "answer_acc_std": 0.008,
+          "win_rate": 0.9994
+        },
+        {
+          "step": 450,
+          "answer_acc": 0.9689,
+          "answer_acc_std": 0.022,
+          "win_rate": 0.995
+        },
+        {
+          "step": 600,
+          "answer_acc": 1.0,
+          "answer_acc_std": 0.0,
+          "win_rate": 1.0
+        }
+      ],
+      "final_answer_acc": 1.0,
+      "final_answer_acc_std": 0.0,
+      "final_win_rate": 1.0,
+      "final_margin": 14.0236
+    },
+    "simpo": {
+      "curve": [
+        {
+          "step": 0,
+          "answer_acc": 0.6994,
+          "answer_acc_std": 0.1676,
+          "win_rate": 0.9661
+        },
+        {
+          "step": 150,
+          "answer_acc": 0.1267,
+          "answer_acc_std": 0.0638,
+          "win_rate": 0.9439
+        },
+        {
+          "step": 300,
+          "answer_acc": 0.0978,
+          "answer_acc_std": 0.0328,
+          "win_rate": 0.9839
+        },
+        {
+          "step": 450,
+          "answer_acc": 0.0761,
+          "answer_acc_std": 0.0247,
+          "win_rate": 0.9917
+        },
+        {
+          "step": 600,
+          "answer_acc": 0.0956,
+          "answer_acc_std": 0.0315,
+          "win_rate": 0.9944
+        }
+      ],
+      "final_answer_acc": 0.0956,
+      "final_answer_acc_std": 0.0315,
+      "final_win_rate": 0.9944,
+      "final_margin": 26.8465
+    }
+  },
+  "dpo_beta_ablation": {
+    "0.05": 0.1106,
+    "0.1": 0.0972,
+    "0.5": 0.0767
+  },
+  "runtime_sec": 408.9
+}
