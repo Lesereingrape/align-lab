@@ -44,7 +44,7 @@ generations. ORPO's built-in SFT anchor sidesteps it. See the tables below.
 pip install -e .                 # torch is the only runtime dependency
 python -m alignlab.cli demo      # seed 0 at the published 600-step budget
 python experiments/run_study.py  # full 3-seed study -> results/alignment.json
-python experiments/run_study.py --out /tmp/again.json  # scratch rerun, leaves results/ alone
+python experiments/run_study.py --out again-check.json  # scratch rerun, leaves results/ alone
 python experiments/make_report.py --write  # splice the block into README.md
 ```
 
@@ -134,11 +134,14 @@ deviation across the 3 seeds (`statistics.pstdev`, divided by n); where a gap
 sits inside the noise it is called out rather than sold. A rerun is bit-exact only
 under the Python/torch/thread environment the JSON records; elsewhere expect the same
 shape, not the same digits — and that is checked rather than asserted:
-`python experiments/run_study.py --out /tmp/again.json` reproduced the committed
+`python experiments/run_study.py --out again-check.json` (a relative scratch file, because
+Git-Bash rewrites a `/tmp/...` argument into `%TEMP%` before the script sees it while cmd and
+PowerShell pass it through and leave it to create `<drive>:\tmp`) reproduced the committed
 artifact with exactly one differing field, `runtime_sec` (940.9s against the published
-1111.6s), while every curve, per-seed trace, mean and the environment block came back
-identical. The limitations section names the one
-structural bias in this setup (chosen == gold favours SFT/ORPO on raw accuracy)
+1111.6s — the second of those is `runtime_sec` in `results/alignment.json` and a test reads
+it back, the first was a scratch file that got thrown away), while every curve, per-seed
+trace, mean and the environment block came back identical. The limitations section names
+the one structural bias in this setup (chosen == gold favours SFT/ORPO on raw accuracy)
 instead of hiding it.
 
 ## References

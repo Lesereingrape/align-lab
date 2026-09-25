@@ -8,3 +8,6 @@ dist/
 .pytest_cache/
 .ruff_cache/
 results/_study.*
+
+# scratch rerun from the documented verification recipe
+again-check.json
