@@ -1,9 +1,9 @@
 """Render the README results block directly from results/alignment.json.
 
 The README numbers are mechanically tied to the committed artifact: run
-``python experiments/run_study.py`` then ``python experiments/make_report.py`` and
-paste the output between the RESULTS markers. A test asserts the README already
-equals this, so nothing is hand-copied.
+``python experiments/run_study.py`` then ``python experiments/make_report.py --write``
+to splice the rendered block back between the RESULTS markers. A test asserts the
+README already equals this, so nothing is hand-copied.
 """
 
 from __future__ import annotations
@@ -37,6 +37,12 @@ def build(data: dict) -> str:
                f"objectives start from the same {cfg['base_steps']}-step SFT base and "
                f"train {cfg['align_steps']} steps on {cfg['n_pairs']} preference pairs; "
                f"mean over {len(cfg['seeds'])} seeds.*")
+    env = data["environment"]
+    out.append(f"*A rerun is expected to reproduce these numbers bit for bit only under "
+               f"the environment the artifact records — Python {env['python']}, torch "
+               f"{env['torch']}, {env['threads']} CPU threads on {env['platform']} — "
+               "because float reduction order over a batch follows the thread count and "
+               "the torch build. Elsewhere expect the same shape, not the same digits.*")
     out.append("")
     out.append(f"- tiny model: **{cfg['params']:,}** parameters (decoder-only "
                "transformer, CPU-only)")
@@ -68,6 +74,27 @@ def build(data: dict) -> str:
                f"{dpo['final_answer_acc']:.3f} - **below the {base['answer_acc']:.2f} base** "
                f"- and SimPO shows the same ({simpo['final_answer_acc']:.3f} acc at "
                f"win-rate {simpo['final_win_rate']:.3f}).")
+    out.append("")
+
+    def _finals(m: str) -> list[float]:
+        per = methods[m]["answer_acc_per_seed"]
+        return [per[k][-1] for k in sorted(per, key=int)]
+
+    dpo_finals = _finals("dpo")
+    below = sum(1 for v in dpo_finals if v < base["answer_acc"])
+    out.append("Per-seed final greedy accuracy — "
+               + ", ".join(f"DPO {v:.3f}" for v in dpo_finals)
+               + " against "
+               + ", ".join(f"ORPO {v:.3f}" for v in _finals("orpo")) + ".")
+    if below == len(dpo_finals):
+        out.append(f"Every one of the {len(dpo_finals)} DPO seeds finishes below the "
+                   f"{base['answer_acc']:.3f} base, so the collapse is a property of the "
+                   "objective on this task rather than one unlucky initialisation.")
+    else:
+        out.append(f"{below} of {len(dpo_finals)} DPO seeds finish below the "
+                   f"{base['answer_acc']:.3f} base, so how far the collapse goes is "
+                   "partly an initialisation effect and the mean alone overstates how "
+                   "uniform it is.")
     out.append("")
 
     out.append("### Held-out greedy answer accuracy vs training step\n")
@@ -112,5 +139,26 @@ def build(data: dict) -> str:
     return "\n".join(out)
 
 
+def _write(path: Path, block: str) -> None:
+    text = path.read_text(encoding="utf-8")
+    start, end = "<!-- RESULTS:START -->", "<!-- RESULTS:END -->"
+    head, _, rest = text.partition(start)
+    _, _, tail = rest.partition(end)
+    nl = "\n"
+    path.write_text(f"{head}{start}{nl}{block}{nl}{end}{tail}", encoding="utf-8")
+
+
 if __name__ == "__main__":
-    print(build(json.loads(Path("results/alignment.json").read_text(encoding="utf-8"))))
+    import argparse
+
+    ap = argparse.ArgumentParser(prog="make_report")
+    ap.add_argument("--write", action="store_true",
+                    help="splice the block into README.md instead of printing it")
+    ap.add_argument("--results", default="results/alignment.json")
+    args = ap.parse_args()
+    rendered = build(json.loads(Path(args.results).read_text(encoding="utf-8")))
+    if args.write:
+        _write(Path("README.md"), rendered)
+        print("README results block rewritten")
+    else:
+        print(rendered)

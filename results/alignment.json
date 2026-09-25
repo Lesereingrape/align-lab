@@ -25,6 +25,11 @@
   "base": {
     "answer_acc": 0.6994,
     "answer_acc_std": 0.1676,
+    "answer_acc_per_seed": {
+      "0": 0.5317,
+      "1": 0.9283,
+      "2": 0.6383
+    },
     "win_rate": 0.9661,
     "margin": 4.6495
   },
@@ -65,7 +70,30 @@
       "final_answer_acc": 1.0,
       "final_answer_acc_std": 0.0,
       "final_win_rate": 1.0,
-      "final_margin": 12.0978
+      "final_margin": 12.0978,
+      "answer_acc_per_seed": {
+        "0": [
+          0.5317,
+          0.975,
+          0.9767,
+          1.0,
+          1.0
+        ],
+        "1": [
+          0.9283,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "2": [
+          0.6383,
+          0.9967,
+          1.0,
+          1.0,
+          1.0
+        ]
+      }
     },
     "dpo": {
       "curve": [
@@ -103,7 +131,30 @@
       "final_answer_acc": 0.0972,
       "final_answer_acc_std": 0.0645,
       "final_win_rate": 0.99,
-      "final_margin": 61.8313
+      "final_margin": 61.8313,
+      "answer_acc_per_seed": {
+        "0": [
+          0.5317,
+          0.0167,
+          0.0333,
+          0.025,
+          0.025
+        ],
+        "1": [
+          0.9283,
+          0.1367,
+          0.15,
+          0.1683,
+          0.1817
+        ],
+        "2": [
+          0.6383,
+          0.115,
+          0.0867,
+          0.045,
+          0.085
+        ]
+      }
     },
     "orpo": {
       "curve": [
@@ -141,7 +192,30 @@
       "final_answer_acc": 1.0,
       "final_answer_acc_std": 0.0,
       "final_win_rate": 1.0,
-      "final_margin": 14.0236
+      "final_margin": 14.0236,
+      "answer_acc_per_seed": {
+        "0": [
+          0.5317,
+          0.9717,
+          0.9817,
+          0.955,
+          1.0
+        ],
+        "1": [
+          0.9283,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "2": [
+          0.6383,
+          0.995,
+          0.9967,
+          0.9517,
+          1.0
+        ]
+      }
     },
     "simpo": {
       "curve": [
@@ -179,7 +253,30 @@
       "final_answer_acc": 0.0956,
       "final_answer_acc_std": 0.0315,
       "final_win_rate": 0.9944,
-      "final_margin": 26.8465
+      "final_margin": 26.8465,
+      "answer_acc_per_seed": {
+        "0": [
+          0.5317,
+          0.0667,
+          0.06,
+          0.0417,
+          0.06
+        ],
+        "1": [
+          0.9283,
+          0.215,
+          0.14,
+          0.0883,
+          0.1367
+        ],
+        "2": [
+          0.6383,
+          0.0983,
+          0.0933,
+          0.0983,
+          0.09
+        ]
+      }
     }
   },
   "dpo_beta_ablation": {
@@ -187,5 +284,12 @@
     "0.1": 0.0972,
     "0.5": 0.0767
   },
-  "runtime_sec": 408.9
+  "environment": {
+    "python": "3.13.7",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "torch": "2.14.0+cpu",
+    "threads": 8,
+    "device": "cpu"
+  },
+  "runtime_sec": 1111.6
 }

@@ -1,6 +1,6 @@
 # alignlab — SFT vs DPO vs ORPO vs SimPO on a verifiable task, on a CPU
 
-**alignlab** is a ~400-line, dependency-light reproduction harness for the four
+**alignlab** is a ~575-line, dependency-light reproduction harness for the four
 post-training objectives that dominate open-LLM alignment today, run honestly at
 toy scale so that every curve is real, seeded, and reproducible in minutes rather
 than borrowed from a paper. The same ~103k-parameter transformer, the same frozen
@@ -42,15 +42,16 @@ generations. ORPO's built-in SFT anchor sidesteps it. See the tables below.
 
 ```bash
 pip install -e .                 # torch is the only runtime dependency
-python -m alignlab.cli demo      # one seeded run, seconds
+python -m alignlab.cli demo      # seed 0 at the published 600-step budget
 python experiments/run_study.py  # full 3-seed study -> results/alignment.json
-python experiments/make_report.py  # re-render the README block from the JSON
+python experiments/make_report.py --write  # splice the block into README.md
 ```
 
 ## Results
 
 <!-- RESULTS:START -->
 *Every figure below is produced by `experiments/run_study.py` on CPU and committed as [`results/alignment.json`](results/alignment.json); the tables are rendered by `experiments/make_report.py`. All four objectives start from the same 200-step SFT base and train 600 steps on 2500 preference pairs; mean over 3 seeds.*
+*A rerun is expected to reproduce these numbers bit for bit only under the environment the artifact records — Python 3.13.7, torch 2.14.0+cpu, 8 CPU threads on Windows-11-10.0.26200-SP0 — because float reduction order over a batch follows the thread count and the torch build. Elsewhere expect the same shape, not the same digits.*
 
 - tiny model: **103,055** parameters (decoder-only transformer, CPU-only)
 - weak SFT base: greedy answer accuracy **0.699** (±0.168), offline pair win-rate 0.966
@@ -66,6 +67,9 @@ python experiments/make_report.py  # re-render the README block from the JSON
 | **SIMPO** | **0.096** (±0.032) | 0.994 | 26.85 |
 
 Read the two accuracy/win-rate columns *together*. On a task where the preferred response is the fully correct chain, plain **SFT** and the SFT-coupled **ORPO** stay at ceiling (1.000). The pure preference objectives do the opposite: **DPO** drives the offline win-rate to 0.990 and the margin to 61.8 yet its *greedy* answer accuracy collapses to 0.097 - **below the 0.70 base** - and SimPO shows the same (0.096 acc at win-rate 0.994).
+
+Per-seed final greedy accuracy — DPO 0.025, DPO 0.182, DPO 0.085 against ORPO 1.000, ORPO 1.000, ORPO 1.000.
+Every one of the 3 DPO seeds finishes below the 0.699 base, so the collapse is a property of the objective on this task rather than one unlucky initialisation.
 
 ### Held-out greedy answer accuracy vs training step
 
@@ -103,12 +107,13 @@ src/alignlab/
   data.py     digit-addition examples, gold CoT, guaranteed-wrong preference pairs
   model.py    TinyTransformer + seq_logprob / sft_loss / generate_cot
   align.py    the four objective losses + METHODS registry
+  study.py    the published budget, shared by the study script and the demo
   train.py    base pre-training, per-method training loop, both evaluations
   cli.py      `alignlab demo`
 experiments/
   run_study.py     multi-seed study + DPO-beta ablation -> results/alignment.json
   make_report.py   renders the exact Results block above from the JSON
-tests/         data / model / objective / README-drift guards
+tests/         data / model / objective + README-drift, demo-vs-study and artifact self-consistency guards
 ```
 
 ## Reproducing and honesty
@@ -116,8 +121,17 @@ tests/         data / model / objective / README-drift guards
 The `Results` block is generated, not typed: a CI test
 (`tests/test_readme_matches_results.py`) asserts the README equals
 `make_report.build(results/alignment.json)`, so no number can drift from the
-committed artifact. Std-devs are across the 3 seeds; where a gap sits inside the
-noise it is called out rather than sold. The limitations section names the one
+committed artifact — and the same test checks that the "~575-line" claim above still
+matches the package. A second guard (`tests/test_demo_matches_study.py`) pins
+`alignlab demo` to `alignlab.study`, so the live command cannot quietly become a
+smaller, differently-tuned experiment than the table it is printed above.
+The artifact also keeps the per-seed curves behind every mean — a third guard
+(`tests/test_artifact_is_internally_consistent.py`) recomputes each published point
+from them, and the Results block states per seed whether the DPO collapse is
+universal or one unlucky initialisation. Std-devs are across the 3 seeds; where a gap
+sits inside the noise it is called out rather than sold. A rerun is bit-exact only
+under the Python/torch/thread environment the JSON records; elsewhere expect the same
+shape, not the same digits. The limitations section names the one
 structural bias in this setup (chosen == gold favours SFT/ORPO on raw accuracy)
 instead of hiding it.
 
