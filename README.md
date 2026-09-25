@@ -129,7 +129,8 @@ smaller, differently-tuned experiment than the table it is printed above.
 The artifact also keeps the per-seed curves behind every mean — a third guard
 (`tests/test_artifact_is_internally_consistent.py`) recomputes each published point
 from them, and the Results block states per seed whether the DPO collapse is
-universal or one unlucky initialisation. Std-devs are across the 3 seeds; where a gap
+universal or one unlucky initialisation. Std-devs are the **population** standard
+deviation across the 3 seeds (`statistics.pstdev`, divided by n); where a gap
 sits inside the noise it is called out rather than sold. A rerun is bit-exact only
 under the Python/torch/thread environment the JSON records; elsewhere expect the same
 shape, not the same digits — and that is checked rather than asserted:
