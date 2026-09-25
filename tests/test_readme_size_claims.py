@@ -1,8 +1,9 @@
-"""Guard the README's hand-written size claim.
+"""Guard the README's hand-written claims that the renderer does not write.
 
 Everything inside the RESULTS markers is byte-pinned against the committed
-artifact; the "~N-line" figure in the first paragraph is the number a reader takes
-on trust, so it gets checked against ``src/`` too.
+artifact; the "~N-line" source size, the parameter count and the two ways the prose
+budgets a run are the figures a reader takes on trust, so they get checked against
+``src/`` and ``results/alignment.json`` here.
 """
 
 from __future__ import annotations
@@ -74,6 +75,25 @@ def test_the_published_wall_clock_is_the_one_the_artifact_records():
     assert float(named[0]) == artifact["runtime_sec"], (
         f"README says the published run took {named[0]}s, "
         f"results/alignment.json records {artifact['runtime_sec']}s")
+
+
+def test_the_blurbs_unit_for_runtime_still_describes_the_run():
+    """"Reproducible in minutes" is a claim about the artifact, not a figure of speech.
+
+    The word survives rewrites of the sentence around it, so a study that grew to two
+    hours would still read fine to a skimming author. The unit has to match the order of
+    magnitude the run actually landed in.
+    """
+    readme = (ROOT / "README.md").read_text(encoding="utf-8")
+    m = re.search(r"reproducible in (seconds|minutes|hours)", readme)
+    assert m, "the opening paragraph no longer budgets the study by unit"
+    artifact = json.loads((ROOT / "results" / "alignment.json").read_text(encoding="utf-8"))
+    bounds = {"seconds": (0.0, 60.0), "minutes": (60.0, 3600.0),
+              "hours": (3600.0, float("inf"))}
+    low, high = bounds[m.group(1)]
+    assert low <= artifact["runtime_sec"] < high, (
+        f"the README calls this reproducible in {m.group(1)}; the committed run took "
+        f"{artifact['runtime_sec']}s")
 
 
 def test_the_documented_rerun_writes_a_relative_scratch_file():
